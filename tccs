@@ -1,0 +1,80 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+
+#tc -s class show dev eth1 | perl -e 'undef $/; while(<>) { while (/class htb (.*?) .*?\n\s*Sent (\d+) .*?\n\s*rate (\d+)/sg) { print "Klasa: $1 Wyslano: $2 ($3bps)\n" }; };'
+
+my $class;
+my $classid;
+my $parent;
+my $rate;
+my $ceil;
+my $crate;
+my $sent;
+my $range;
+my %tree;
+my $recurse=10;
+
+GetOptions('recurse=s'=>\$recurse);
+
+while(<STDIN>) {
+	if(/^ lended: / and $crate) {
+		if($rate ne $ceil) {
+			$range="$rate-$ceil";
+		} else {
+			$range=$rate;
+		}
+#		print "$parent: $class $classid $range $crate kb/s\n";
+		@{$tree{$parent}}[0]='' unless @{$tree{$parent}}[0];
+		push @{$tree{$parent}}, $classid;
+		$crate=sprintf "%8.1lf",$crate;
+		$sent=sprintf "%10.0lf",$sent/1024;
+		@{$tree{$classid}}[0]="($class) $range	$crate kb/s	($sent KB)";
+		$crate=0;
+		next;
+	}
+	if(/^ Sent (\d+) bytes /) {
+		$sent=$1;
+		next;
+	}
+	if(/^ rate (\S+)(bit|bps) /) {
+		print "BPS rate!\n" if $2 eq "bps";
+		($crate=$1)=~s/K/*1024/;
+		$crate=~s/M/*1024*1024/;
+		$crate=eval $crate;
+		$crate*=8/1000;
+		next;
+	}
+	if(/^class (\S+) (\d+:\d+) (root|parent (\d+:\d+)) .*rate (\S+) ceil (\S+)/) {
+		$class=$1;
+		$classid=$2;
+		$rate=$5;
+		$ceil=$6;
+		($parent=$3)=~s/parent //;
+		next;
+	}
+}
+
+my $level='';
+
+sub list {
+	return if length($level)/2==$recurse;
+	printf "$level%-4s",$_[0] if $_[0];
+	$level.='  ';
+	foreach my $id (@{$tree{$_[0]}}) {
+		if($id=~/^\(/) {
+			print "	$id\n";
+			next;
+		} else {
+			list($id);
+		}
+	}
+	$level=substr($level,2);
+}
+
+#@{$tree{'root'}}[0]="\n";
+#list('root');
+foreach (@{$tree{'root'}}) {
+	list($_);
+}
