@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 
-use strict;
+# copyright gotar <gotar@pld-linux.org>, 2005
+# license: GPL
+
+#use strict;
 use Getopt::Long;
 
 #tc -s class show dev eth1 | perl -e 'undef $/; while(<>) { while (/class htb (.*?) .*?\n\s*Sent (\d+) .*?\n\s*rate (\d+)/sg) { print "Klasa: $1 Wyslano: $2 ($3bps)\n" }; };'

@@ -1,6 +1,9 @@
 #!/usr/bin/perl -w
 
-use strict;
+# copyright gotar <gotar@pld-linux.org>, 2005
+# license: GPL
+
+#use strict;
 use Getopt::Long;
 use Sys::Hostname;
 
