@@ -15,8 +15,13 @@ my $sent;
 my $range;
 my %tree;
 my $recurse=10;
+my $speedlevel=0;
+my %translate;
 
-GetOptions('recurse=s'=>\$recurse);
+eval `cat tccs.rc`;
+
+GetOptions('recurse=s'=>\$recurse,
+		'fastest=s'=>\$speedlevel);
 
 while(<STDIN>) {
 	if(/^ lended: / and $crate) {
@@ -39,14 +44,14 @@ while(<STDIN>) {
 		next;
 	}
 	if(/^ rate (\S+)(bit|bps) /) {
-		print "BPS rate!\n" if $2 eq "bps";
+		# print "BPS rate!\n" if $2 eq "bps";
 		($crate=$1)=~s/K/*1024/;
 		$crate=~s/M/*1024*1024/;
 		$crate=eval $crate;
 		$crate*=8/1000;
 		next;
 	}
-	if(/^class (\S+) (\d+:\d+) (root|parent (\d+:\d+)) .*rate (\S+) ceil (\S+)/) {
+	if(/^class (\S+) (\S+:\S+) (root|parent (\S+:\S+)) .*rate (\S+) ceil (\S+)/) {
 		$class=$1;
 		$classid=$2;
 		$rate=$5;
@@ -58,15 +63,35 @@ while(<STDIN>) {
 
 my $level='';
 
+sub my_sort {
+	return 0 unless $_[0];
+	return $_[0] cmp $_[1] unless $speedlevel;
+	return -1 if($a=~/^\(/);
+	$tree{$_[0]}[0]=~m|\(\S+\)\ \S+	\s*([\d\.]+) kb/s	\(|;
+	my $a=$1;
+	$tree{$_[1]}[0]=~m|\(\S+\)\ \S+	\s*([\d\.]+) kb/s	\(|;
+	my $b=$1;
+	return $b <=> $a;
+}
+
 sub list {
 	return if length($level)/2==$recurse;
-	printf "$level%-4s",$_[0] if $_[0];
+	if($_[0]) {
+		if(exists $translate{$_[0]}) {
+			printf "$level%-4s",$translate{$_[0]};
+		} else {
+			printf "$level%-4s",$_[0];
+		}
+	} else { return; }
 	$level.='  ';
-	foreach my $id (@{$tree{$_[0]}}) {
+	my $rank=0;
+	foreach my $id (sort {my_sort($a,$b)} (@{$tree{$_[0]}})) {
 		if($id=~/^\(/) {
 			print "	$id\n";
 			next;
 		} else {
+			$rank++;
+			next if $rank>$speedlevel and $speedlevel;
 			list($id);
 		}
 	}
@@ -75,6 +100,6 @@ sub list {
 
 #@{$tree{'root'}}[0]="\n";
 #list('root');
-foreach (@{$tree{'root'}}) {
+foreach (sort {my_sort($a,$b)} (@{$tree{'root'}})) {
 	list($_);
 }
