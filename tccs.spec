@@ -1,19 +1,23 @@
 Summary:	Show tc statistics in a nicer way
+Summary(pl):	Parser statystyk klas tc
 Name:		tccs
 Version:	0.1
 Release:	1
 License:	GPL
 Group:		Networking
-Source0:	http://tccs.sourceforge.net/tccs
-# Source0-md5:	1a52b887a5ea8a98f353247b837540f3
-Source1:	http://tccs.sourceforge.net/tccg
-# Source1-md5:	9150cc5227a8e7d3208464d77d60d82c
+Source0:	tccs
+Source1:	tccg
 URL:		http://tccs.sourceforge.net/
 BuildArch:	noarch
 Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
-Show tc statistics in a nicer way.
+Show tc statistics in a nicer way. There is also tc-viewer with
+different approach.
+
+%description -l pl.UTF-8
+Parser statystyk klas tc, przedstawiający je w czytelnej formie.
+Nieco inne podejście zastosowano w projekcie tc-viewer.
 
 %prep
 %setup -q -c -T
@@ -25,7 +29,7 @@ install -d $RPM_BUILD_ROOT%{_sbindir}
 install %{SOURCE0} %{SOURCE1} $RPM_BUILD_ROOT%{_sbindir}
 
 %clean
-rm -rf ${RPM_BUILD_ROOT}
+rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(644,root,root,755)
