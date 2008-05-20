@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# copyright gotar <gotar@pld-linux.org>, 2005
+# copyright 2005-2008 Tomasz Pala <gotar@pld-linux.org>
 # license: GPL
 
 #use strict;
@@ -21,7 +21,7 @@ my $recurse=10;
 my $speedlevel=0;
 my %translate;
 
-eval `cat tccs.rc`;
+eval `cat tccs.rc 2>/dev/null`;
 
 GetOptions('recurse=s'=>\$recurse,
 		'fastest=s'=>\$speedlevel);
@@ -48,10 +48,17 @@ while(<STDIN>) {
 	}
 	if(/^ rate (\S+)(bit|bps) /) {
 		# print "BPS rate!\n" if $2 eq "bps";
+	if ($2 eq "bps") {
 		($crate=$1)=~s/K/*1024/;
 		$crate=~s/M/*1024*1024/;
 		$crate=eval $crate;
 		$crate*=8/1000;
+	} else {
+		($crate=$1)=~s/K/*1000/;
+		$crate=~s/M/*1000*1000/;
+		$crate=eval $crate;
+		$crate/=1000;
+	}
 		next;
 	}
 	if(/^class (\S+) (\S+:\S+) (root|parent (\S+:\S+)) .*rate (\S+) ceil (\S+)/) {
@@ -103,6 +110,8 @@ sub list {
 
 #@{$tree{'root'}}[0]="\n";
 #list('root');
+if(defined $tree{'root'}) {
 foreach (sort {my_sort($a,$b)} (@{$tree{'root'}})) {
 	list($_);
+}
 }
