@@ -3,6 +3,13 @@
 # copyright 2005-2008 Tomasz Pala <gotar@pld-linux.org>
 # license: GPL
 
+# usage:
+# watch -d -n1 'tc -s c ls dev imq1 | tccs -f 10 2>/dev/null'
+
+# tccs.rc file format:
+# %translate = ( '1:2' => 'LAN', '1:4076' => 'pc76', '1:b238' => 'VoIP-3_29 );
+
+
 #use strict;
 use Getopt::Long;
 
