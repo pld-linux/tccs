@@ -1,5 +1,5 @@
 Summary:	Show tc statistics in a nicer way
-Summary(pl):	Parser statystyk klas tc
+Summary(pl.UTF-8):	Analizator statystyk klas tc
 Name:		tccs
 Version:	0.1
 Release:	1
@@ -16,7 +16,7 @@ Show tc statistics in a nicer way. There is also tc-viewer with
 different approach.
 
 %description -l pl.UTF-8
-Parser statystyk klas tc, przedstawiający je w czytelnej formie.
+Analizator statystyk klas tc, przedstawiający je w czytelnej formie.
 Nieco inne podejście zastosowano w projekcie tc-viewer.
 
 %prep
