@@ -9,7 +9,7 @@ Source0:	tccs
 Source1:	tccg
 URL:		http://tccs.sourceforge.net/
 BuildArch:	noarch
-Buildroot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 Show tc statistics in a nicer way. There is also tc-viewer with
